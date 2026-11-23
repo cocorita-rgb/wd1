@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>김호준 & 이미소 결혼합니다</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Google Fonts: Inter & Nanum Myeongjo -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!-- FontAwesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+brand: {
+bg: '#FBF9F7',
+card: '#FFFFFF',
+primary: '#8C7A6B',
+secondary: '#A69585',
+accent: '#D4C5B9',
+dark: '#4A423D',
+light: '#F4F1EA',
+}
+},
+fontFamily: {
+sans: ['Inter', 'sans-serif'],
+serif: ['Nanum Myeongjo', 'serif'],
+}
+}
+}
+}
+</script>
+<style>
+body {
+background-color: #e5e5e5;
+font-family: 'Inter', 'Nanum Myeongjo', sans-serif;
+}
+.romantic-shadow {
+box-shadow: 0 10px 30px -10px rgba(140, 122, 107, 0.15);
+}
+/* Custom scrollbar for gallery /
+::-webkit-scrollbar {
+width: 6px;
+height: 6px;
+}
+::-webkit-scrollbar-track {
+background: #F4F1EA;
+}
+::-webkit-scrollbar-thumb {
+background: #D4C5B9;
+border-radius: 3px;
+}
+/ Hide scrollbar for clean horizontal gallery scroll */
+.no-scrollbar::-webkit-scrollbar {
+display: none;
+}
+.no-scrollbar {
+-ms-overflow-style: none;
+scrollbar-width: none;
+}
+</style>
+</head>
+<body class="bg-stone-200 text-brand-dark flex justify-center items-center min-h-screen p-0 sm:py-6">
+
+<!-- BGM 플로팅 플레이어 버튼 -->
+<div class="fixed top-4 right-4 z-50">
+<button id="bgmToggleBtn" onclick="toggleBGM()" class="flex items-center space-x-2 bg-white/80 backdrop-blur-md hover:bg-white text-brand-dark border border-brand-accent/50 px-3.5 py-2 rounded-full shadow-lg transition-all text-xs font-medium">
+<i id="bgmIcon" class="fa-solid fa-music text-brand-primary animate-bounce"></i>
+<span id="bgmText">BGM 켜기</span>
+</button>
+</div>
+
+<!-- 유튜브 BGM 백그라운드 플레이어 (화면 숨김 처리) -->
+<div class="fixed -top-[9999px] -left-[9999px] w-1 h-1 overflow-hidden pointer-events-none opacity-0">
+<div id="youtube-bgm-player"></div>
+</div>
+
+<!-- Mobile Frame Wrapper (Max-width 430px) -->
+<div class="w-full max-w-[430px] bg-brand-bg min-h-screen sm:min-h-[850px] sm:rounded-[40px] romantic-shadow overflow-hidden relative flex flex-col justify-between">
+
+<main class="w-full pb-16">
+
+<!-- 1. 메인 커버 섹션 (꽃잎 흩날림 캔버스 포함) -->
+<section class="relative w-full overflow-hidden bg-brand-bg">
+
+<!-- 인물을 가리지 않도록 사진 영역 위에 독립된 상단 바 영역으로 배치 -->
+<div class="pt-6 pb-4 px-6 text-center">
+<div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-brand-light text-brand-primary text-[10px] sm:text-[11px] font-medium tracking-[0.35em] uppercase shadow-sm border border-brand-accent/30">
+<span class="w-1.5 h-1.5 rounded-full bg-brand-primary animate-pulse"></span>
+<span>WEDDING INVITATION</span>
+</div>
+</div>
+
+<div class="relative w-full overflow-hidden" style="aspect-ratio: 3/4;">
+<img src="https://postfiles.pstatic.net/MjAyNjExMDlfMjA5/MDAxNzk0MTkwMjE4OTgz.dlb5LMyyrMRa5-4EX3dRAYAN1OScfzTw8tmyKI9L6qkg.od0ke2HFIjYSPovi8KOh8IlDkqsYYQFy2ZT2r4sPNukg.JPEG/1.jpg?type=w773"
+alt="신랑 김호준 & 신부 이미소 메인 사진"
+class="w-full h-full object-cover object-center"
+onerror="this.src='https://placehold.co/600x800/F0EAE1/8C827A?text=Wedding+Photo'">
+
+<!-- Flowers Petals Canvas Overlay -->
+<canvas id="petalCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-10"></canvas>
+</div>
+
+<!-- Title & Info Overlay -->
+<div class="px-6 pt-8 pb-4 text-center bg-brand-bg relative z-20">
+<p class="text-xs uppercase tracking-[0.25em] text-brand-secondary mb-3 font-semibold">Wedding Invitation</p>
+<h1 class="font-serif text-2xl sm:text-3xl font-bold tracking-wide text-brand-dark mb-2 whitespace-nowrap">
+김호준 <span class="text-brand-primary font-light text-xl sm:text-2xl mx-1">&</span> 이미소
+</h1>
+<div class="w-8 h-[1px] bg-brand-accent mx-auto my-4"></div>
+<p class="text-xs sm:text-sm font-light text-stone-600 tracking-wider leading-relaxed">
+2026년 11월 14일 토요일 낮 12시 30분<br>
+더 화이트베일 7층 다이아몬드홀
+</p>
+</div>
+</section>
+
+<!-- 2. 초대 인사말 섹션 -->
+<section class="px-6 py-12 text-center bg-brand-bg">
+<div class="inline-block p-3 rounded-full bg-brand-light mb-6">
+<i class="fa-regular fa-heart text-brand-primary text-lg"></i>
+</div>
+<h2 class="font-serif text-xl font-bold text-brand-dark mb-6 tracking-wide">소중한 분들을 초대합니다</h2>
+<p class="text-xs sm:text-sm leading-relaxed text-stone-600 font-light mb-8 break-keep">
+평생을 함께하고 싶은 사람을 만났습니다.<br>
+서로 아껴주고 이해하며<br>
+사랑을 키워온 두 사람이 이제 붉은 노을처럼<br>
+따뜻한 가정을 이루려 합니다.<br><br>
+소중한 발걸음하시어 저희의 앞날을<br>
+축복해 주시면 감사하겠습니다.
+</p>
+
+<!-- 혼주 정보 -->
+<div class="bg-white/70 p-5 rounded-2xl border border-stone-200/60 text-xs sm:text-sm text-stone-700 space-y-3">
+<div class="flex flex-wrap justify-center items-center gap-1.5">
+<span class="font-medium text-stone-500">신랑 아버지</span>
+<span class="font-semibold text-stone-800">김철형</span>
+<span class="text-stone-300">·</span>
+<span class="font-medium text-stone-500">어머니</span>
+<span class="font-semibold text-stone-800">장희연</span>
+<span class="text-[11px] text-stone-400">(의 아들)</span>
+<span class="font-bold text-brand-dark">호준</span>
+</div>
+<div class="w-full h-[1px] bg-stone-100 my-1"></div>
+<div class="flex flex-wrap justify-center items-center gap-1.5">
+<span class="font-medium text-stone-500">신부 아버지</span>
+<span class="font-semibold text-stone-800">이상철</span>
+<span class="text-stone-300">·</span>
+<span class="font-medium text-stone-500">어머니</span>
+<span class="font-semibold text-stone-800">임서정</span>
+<span class="text-[11px] text-stone-400">(의 딸)</span>
+<span class="font-bold text-brand-dark">미소</span>
+</div>
+</div>
+</section>
+
+<!-- 웨딩 영상 섹션 -->
+<section class="px-6 py-10 bg-brand-bg border-t border-stone-200/50">
+<div class="text-center mb-6">
+<p class="text-xs uppercase tracking-[0.2em] text-brand-secondary mb-2">Wedding Movie</p>
+<h2 class="font-serif text-xl font-bold text-brand-dark">웨딩 영상</h2>
+<div class="w-8 h-[1px] bg-brand-accent mx-auto mt-3"></div>
+</div>
+
+<!-- 16:9 비율 썸네일 버튼 및 인라인 플레이어 컨테이너 -->
+<div id="weddingVideoContainer" class="relative w-full aspect-video rounded-2xl overflow-hidden shadow-md bg-stone-900 border border-stone-200/80">
+<button type="button" onclick="playInlineWeddingVideo()" class="group relative block w-full h-full focus:outline-none cursor-pointer">
+<img src="https://img.youtube.com/vi/nW-NmR8JBTY/hqdefault.jpg"
+alt="웨딩 영상 썸네일"
+class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+
+<!-- 어두운 오버레이 -->
+<div class="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
+
+<!-- 가운데 흰색 동그란 재생 버튼 -->
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white/95 group-hover:bg-white group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-xl">
+<i class="fa-solid fa-play text-brand-dark text-lg sm:text-xl ml-1"></i>
+</div>
+</div>
+</button>
+</div>
+
+<!-- 하단 YouTube에서 보기 링크 -->
+<div class="text-right mt-2.5">
+<a href="https://www.youtube.com/watch?v=nW-NmR8JBTY" target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-1 text-[11px] text-stone-400 hover:text-brand-primary transition-colors">
+<span>YouTube에서 보기</span>
+<i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+</a>
+</div>
+</section>
+
+<!-- 3. 신랑 혼주 연락처 버튼 섹션 -->
+<section class="px-6 py-6 bg-brand-light/50">
+<h3 class="text-center text-xs uppercase tracking-widest text-brand-secondary mb-4 font-semibold">Contact Parents</h3>
+<div class="grid grid-cols-2 gap-3">
+<a href="tel:01056471010" class="flex items-center justify-center space-x-1.5 bg-white hover:bg-brand-primary hover:text-white transition-all text-stone-700 py-3.5 px-3 rounded-xl border border-stone-200 text-xs font-medium shadow-sm group">
+<i class="fa-solid fa-phone text-brand-primary group-hover:text-white text-[10px]"></i>
+<span class="truncate">신랑 아버님 연락</span>
+</a>
+<a href="tel:01056471010" class="flex items-center justify-center space-x-1.5 bg-white hover:bg-brand-primary hover:text-white transition-all text-stone-700 py-3.5 px-3 rounded-xl border border-stone-200 text-xs font-medium shadow-sm group">
+<i class="fa-solid fa-phone text-brand-primary group-hover:text-white text-[10px]"></i>
+<span class="truncate">신랑 어머님 연락</span>
+</a>
+</div>
+</section>
+
+<!-- 4. 갤러리 앨범 섹션 (가로 스와이프 슬라이더 적용) -->
+<section class="py-12 bg-brand-bg overflow-hidden">
+<div class="text-center mb-6 px-6">
+<p class="text-xs uppercase tracking-[0.2em] text-brand-secondary mb-2">Gallery</p>
+<h2 class="font-serif text-2xl font-bold text-brand-dark">우리들의 소중한 순간</h2>
+<div class="w-8 h-[1px] bg-brand-accent mx-auto mt-3"></div>
+</div>
+
+<!-- 가로 스와이프 캐러셀 뷰어 -->
+<div class="relative w-full">
+<div id="gallerySlider" class="flex overflow-x-auto snap-x snap-mandatory no-scrollbar px-6 gap-4 pb-4">
+<!-- 동적 생성 -->
+</div>
+
+<!-- 슬라이드 내비게이션 화살표 버튼 -->
+<div class="flex justify-center items-center space-x-4 mt-3">
+<button onclick="slideGallery(-1)" class="w-9 h-9 rounded-full bg-white shadow-md border border-stone-200 flex items-center justify-center text-stone-600 hover:bg-brand-primary hover:text-white transition-colors">
+<i class="fa-solid fa-chevron-left text-xs"></i>
+</button>
+<span id="slideIndicator" class="text-xs font-mono text-stone-500">1 / 8</span>
+<button onclick="slideGallery(1)" class="w-9 h-9 rounded-full bg-white shadow-md border border-stone-200 flex items-center justify-center text-stone-600 hover:bg-brand-primary hover:text-white transition-colors">
+<i class="fa-solid fa-chevron-right text-xs"></i>
+</button>
+</div>
+</div>
+<p class="text-center text-xs text-stone-400 mt-4"><i class="fa-regular fa-hand-pointer mr-1"></i> 사진을 터치하면 크게 볼 수 있습니다.</p>
+</section>
+
+<!-- 5. 오시는 길 및 구글 맵 섹션 -->
+<section class="px-6 py-12 bg-brand-light/30 border-t border-stone-200/50">
+<div class="text-center mb-8">
+<p class="text-xs uppercase tracking-[0.2em] text-brand-secondary mb-2">Location</p>
+<h2 class="font-serif text-2xl font-bold text-brand-dark">오시는 길</h2>
+<div class="w-8 h-[1px] bg-brand-accent mx-auto mt-3"></div>
+</div>
+
+<!-- 예식장 정보 카드 -->
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-stone-200/80 mb-6">
+<h3 class="font-serif text-lg font-bold text-brand-dark mb-2">더 화이트베일 7층 다이아몬드홀</h3>
+<p class="text-xs text-stone-500 mb-4 leading-relaxed">
+서울 서초구 서초중앙로 14 (서초동 1445-14)<br>
+TEL: 02-521-1010
+</p>
+<div class="flex space-x-2">
+<button onclick="openShareModal()" class="flex-1 bg-brand-primary hover:bg-stone-800 text-white py-3 px-4 rounded-xl text-xs font-medium transition-colors flex items-center justify-center space-x-2 shadow-sm">
+<i class="fa-solid fa-share-nodes"></i>
+<span>장소 공유하기</span>
+</button>
+</div>
+</div>
+
+<!-- 구글 맵 실시간 조회 프레임 -->
+<div class="w-full h-64 rounded-2xl overflow-hidden shadow-sm border border-stone-200/80 relative bg-stone-100">
+<iframe
+width="100%"
+height="100%"
+style="border:0;"
+allowfullscreen=""
+loading="lazy"
+referrerpolicy="no-referrer-when-downgrade"
+src="https://maps.google.com/maps?q=서울+서초구+서초중앙로+14&t=&z=16&ie=UTF8&iwloc=&output=embed">
+</iframe>
+</div>
+
+<div class="mt-6 text-xs text-stone-600 space-y-2 px-2">
+<p class="font-semibold text-brand-dark flex items-center"><i class="fa-solid fa-subway mr-2 text-brand-primary"></i> 지하철 안내</p>
+<p class="pl-5 text-stone-500">3호선 / 7호선 고속터미널역 또는 남부터미널역 인근</p>
+
+<p class="font-semibold text-brand-dark flex items-center pt-2"><i class="fa-solid fa-car mr-2 text-brand-primary"></i> 자가용 안내</p>
+<p class="pl-5 text-stone-500">내비게이션 '더 화이트베일' 또는 '서초중앙로 14' 검색 (주차장 완비)</p>
+</div>
+</section>
+
+<!-- 6. 마음 전하실 곳 (축의금 계좌) -->
+<section class="px-6 py-12 bg-brand-bg">
+<div class="text-center mb-8">
+<p class="text-xs uppercase tracking-[0.2em] text-brand-secondary mb-2">Congratulatory Money</p>
+<h2 class="font-serif text-2xl font-bold text-brand-dark">마음 전하실 곳</h2>
+<div class="w-8 h-[1px] bg-brand-accent mx-auto mt-3"></div>
+</div>
+
+<div class="space-y-4">
+<!-- 신랑측 계좌 -->
+<div class="bg-white p-5 rounded-2xl border border-stone-200/80 shadow-sm">
+<div class="flex justify-between items-center mb-3">
+<span class="text-xs font-semibold text-stone-500 uppercase tracking-wider">신랑측 계좌</span>
+<span class="text-sm font-bold text-brand-dark">김호준</span>
+</div>
+<div class="flex items-center justify-between bg-brand-light/50 p-3 rounded-xl">
+<div>
+<p class="text-xs text-stone-500">농협은행</p>
+<p class="text-sm font-mono font-bold text-stone-800 tracking-wide">122-2938-1876</p>
+</div>
+<button onclick="copyAccount('12229381876')" class="bg-white hover:bg-brand-primary hover:text-white border border-stone-200 px-3 py-2 rounded-lg text-xs font-medium transition-all shadow-sm">
+복사하기
+</button>
+</div>
+</div>
+</div>
+</section>
+
+</main>
+
+<!-- 푸터 저작권 -->
+<footer class="py-6 text-center bg-stone-900 text-stone-400 text-xs">
+<p class="font-serif tracking-wider">HOJUN & MISO</p>
+<p class="text-[10px] text-stone-500 mt-1">Thank you for celebrating with us.</p>
+</footer>
+</div>
+
+<!-- 라이트박스 (이미지 크게보기 팝업) -->
+<div id="lightbox" class="fixed inset-0 bg-black/90 z-50 hidden flex-col items-center justify-center p-4">
+<button onclick="closeLightbox()" class="absolute top-6 right-6 text-white text-3xl p-2 hover:text-brand-accent transition-colors">
+<i class="fa-solid fa-xmark"></i>
+</button>
+<div class="relative max-w-full max-h-[80vh] flex items-center justify-center">
+<img id="lightboxImg" src="" alt="확대 이미지" class="max-h-[80vh] max-w-full object-contain rounded-lg">
+</div>
+<div class="text-white/70 text-xs mt-4 font-mono">
+<span id="currentIndex">1</span> / <span id="totalIndex">8</span>
+</div>
+</div>
+
+<!-- 공유하기 모달 -->
+<div id="shareModal" class="fixed inset-0 bg-black/50 z-50 hidden items-end sm:items-center justify-center p-0 sm:p-4">
+<div class="bg-white w-full max-w-md rounded-t-[25px] sm:rounded-2xl p-6 shadow-2xl animate-in fade-in slide-in-from-bottom duration-300">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-serif text-lg font-bold text-brand-dark">모바일 청첩장 공유하기</h3>
+<button onclick="closeShareModal()" class="text-stone-400 hover:text-stone-600">
+<i class="fa-solid fa-xmark text-lg"></i>
+</button>
+</div>
+
+<div class="grid grid-cols-3 gap-4 mb-6">
+<button onclick="shareKakao()" class="flex flex-col items-center justify-center p-3 rounded-xl bg-amber-50 hover:bg-amber-100 transition-colors text-amber-900">
+<div class="w-12 h-12 rounded-full bg-amber-400 flex items-center justify-center text-stone-900 mb-2 text-lg font-bold shadow-sm">
+<i class="fa-solid fa-comment"></i>
+</div>
+<span class="text-xs font-medium">카카오톡</span>
+</button>
+<button onclick="shareSMS()" class="flex flex-col items-center justify-center p-3 rounded-xl bg-stone-50 hover:bg-stone-100 transition-colors text-stone-700">
+<div class="w-12 h-12 rounded-full bg-emerald-500 text-white flex items-center justify-center mb-2 text-lg shadow-sm">
+<i class="fa-solid fa-message"></i>
+</div>
+<span class="text-xs font-medium">문자 메시지</span>
+</button>
+<button onclick="copyLink()" class="flex flex-col items-center justify-center p-3 rounded-xl bg-stone-50 hover:bg-stone-100 transition-colors text-stone-700">
+<div class="w-12 h-12 rounded-full bg-stone-200 text-stone-700 flex items-center justify-center mb-2 text-lg shadow-sm">
+<i class="fa-solid fa-link"></i>
+</div>
+<span class="text-xs font-medium">링크 복사</span>
+</button>
+</div>
+
+<button onclick="closeShareModal()" class="w-full bg-stone-100 hover:bg-stone-200 text-stone-700 py-3 rounded-xl text-sm font-medium transition-colors">
+닫기
+</button>
+</div>
+</div>
+
+<!-- 알림 토스트 메시지 -->
+<div id="toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-stone-900/90 text-white px-5 py-2.5 rounded-full text-xs font-medium shadow-lg transition-all opacity-0 pointer-events-none z-50">
+계좌번호가 복사되었습니다.
+</div>
+
+<!-- JavaScript Logic -->
+<script>
+// 1번 사진 꽃잎 흩날림 애니메이션 구현
+window.addEventListener('load', () => {
+const canvas = document.getElementById('petalCanvas');
+if (!canvas) return;
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+canvas.width = canvas.offsetWidth;
+canvas.height = canvas.offsetHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+const petals = [];
+const petalCount = 20;
+
+for (let i = 0; i < petalCount; i++) {
+petals.push({
+x: Math.random() * canvas.width,
+y: Math.random() * canvas.height,
+size: Math.random() * 6 + 5,
+speedY: Math.random() * 0.7 + 0.3,
+speedX: Math.random() * 1 - 0.5,
+rotation: Math.random() * 360,
+rotationSpeed: Math.random() * 2 - 1,
+opacity: Math.random() * 0.5 + 0.4
+});
+}
+
+function animatePetals() {
+ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+petals.forEach(p => {
+p.y += p.speedY;
+p.x += Math.sin(p.y * 0.02) * 0.6 + p.speedX;
+p.rotation += p.rotationSpeed;
+
+if (p.y > canvas.height + 20) {
+p.y = -20;
+p.x = Math.random() * canvas.width;
+}
+if (p.x > canvas.width + 20) p.x = -20;
+if (p.x < -20) p.x = canvas.width + 20;
+
+ctx.save();
+ctx.translate(p.x, p.y);
+ctx.rotate((p.rotation * Math.PI) / 180);
+ctx.globalAlpha = p.opacity;
+
+// 꽃잎 그리기
+ctx.fillStyle = '#FFD1DC';
+ctx.beginPath();
+ctx.ellipse(0, 0, p.size, p.size / 2, 0, 0, Math.PI * 2);
+ctx.fill();
+
+ctx.restore();
+});
+
+requestAnimationFrame(animatePetals);
+}
+
+animatePetals();
+});
+
+// 갤러리 이미지 URL 배열 (5번 제외 8장)
+const galleryImages = [
+"https://postfiles.pstatic.net/MjAyNjExMDlfMjMz/MDAxNzk0MTkwMjE4OTQ0.Q-TGbk0o4hRrGB9t6Cq-6Xr_peztm8rVnrNB-8Bdauog.daqd_WdLndIHyrRRVF3dw5mVK2MGnCr_jAm5yBQtjOsg.JPEG/2.jpg?type=w773",
+"https://postfiles.pstatic.net/MjAyNjExMDlfMjMw/MDAxNzk0MTkwMjE4OTkx.w4TwK0pim5rb2EMZD1C-SuClgC_xy8ozUVL5BXu6DVAg.2kH9IQuCnPfFuIQoWMFU52qi4I2flRKs97TiByiUbhog.JPEG/3.jpg?type=w773",
+"https://postfiles.pstatic.net/MjAyNjExMDlfOTQg/MDAxNzk0MTkwMjE5NTc1.HloP7LED6700uRHuLhhSPvWksBAg0YfsQ-YAY2M8FY8g.GUIHdJa3rL6knHoB0W9F-mpta4Rup3JPTTX_gimNt-kg.JPEG/4.jpg?type=w773",
+"https://postfiles.pstatic.net/MjAyNjExMDlfMyAg/MDAxNzk0MTkwMjE5NzE3.2jKqGs7Ir46XJxTQOKcrVGggwdY59s_NJHB4uX3X8lcg.GWDX4y0fSig3W_rJjNUK_VvARXOX1pRrAJh2HPa-32wg.JPEG/6.jpg?type=w773",
+"https://postfiles.pstatic.net/MjAyNjExMDlfMTE3/MDAxNzk0MTkwMjE4OTM1.6X8wImiHYgpTLjiuO4wqBP2BKTO0bEuM5suRJSi4g8wg.TiRVJFirhGofXoitzF7StnDC_KFvxJ1j5AGBAvRLsPgg.JPEG/7.jpg?type=w773",
+"https://postfiles.pstatic.net/MjAyNjExMDlfNjMg/MDAxNzk0MTkwMjE4ODg2.JnBnvAbDwH-WHgV2EaCDGf7ca3oQYRSy5sKmnxUckl8g.QcsLTEPmVxjViUo8v9HDjZ4wc4h7qSTUwFSA7KreUlYg.JPEG/8.jpg?type=w773",
+"https://postfiles.pstatic.net/MjAyNjExMDlfNDQg/MDAxNzk0MTkwMjE5NzYz.J9CpGeogoQF2xpPSVzqoHQACh4Dy6Z1JMwpNuMQP-bEg.puEBh1ZUEdbFeT8P7Nu2Uu3-O3DJrO2x011-sFzvUHcg.JPEG/9.jpg?type=w773",
+"https://postfiles.pstatic.net/MjAyNjExMDlfMiAg/MDAxNzk0MTkwMjE4OTcy.bVzOtuQdlhkGj-koWAS1NhRfU_dWlKxjlul1cz1RNgsg.sIfjloAwN6eDC0XRC8SgBUVRyo5bf2lEezGTdXmlJLgg.JPEG/10.jpg?type=w773"
+ ];
+
+// 갤러리 슬라이더 동적 렌더링 (가로 넘기기 캐러셀)
+const gallerySlider = document.getElementById('gallerySlider');
+galleryImages.forEach((url, idx) => {
+const div = document.createElement('div');
+div.className = "flex-shrink-0 w-[300px] sm:w-[320px] snap-center relative overflow-hidden rounded-2xl bg-stone-100 cursor-pointer group shadow-md transition-transform duration-500 hover:scale-[1.02]";
+div.style.aspectRatio = "4/5";
+div.innerHTML = &lt;img src="${url}" alt="갤러리 사진 ${idx + 1}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onerror="this.src='https://placehold.co/400x500/F0EAE1/8C827A?text=Photo'"&gt; &lt;div class="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"&gt;&lt;/div&gt;;
+div.onclick = () => openLightbox(idx);
+gallerySlider.appendChild(div);
+});
+
+// 슬라이더 이동 버튼 함수
+const sliderContainer = document.getElementById('gallerySlider');
+sliderContainer.addEventListener('scroll', updateSlideIndicator);
+
+function slideGallery(direction) {
+const cardWidth = sliderContainer.querySelector('div').offsetWidth + 16; // gap 포함
+sliderContainer.scrollBy({ left: direction * cardWidth, behavior: 'smooth' });
+}
+
+function updateSlideIndicator() {
+const cardWidth = sliderContainer.querySelector('div').offsetWidth + 16;
+const scrollLeft = sliderContainer.scrollLeft;
+const currentIndex = Math.round(scrollLeft / cardWidth) + 1;
+document.getElementById('slideIndicator').innerText = ${Math.min(Math.max(currentIndex, 1), galleryImages.length)} / ${galleryImages.length};
+}
+
+let currentLightboxIndex = 0;
+
+function openLightbox(index) {
+currentLightboxIndex = index;
+const lightbox = document.getElementById('lightbox');
+const img = document.getElementById('lightboxImg');
+img.src = galleryImages[index];
+document.getElementById('currentIndex').innerText = index + 1;
+document.getElementById('totalIndex').innerText = galleryImages.length;
+lightbox.classList.remove('hidden');
+lightbox.classList.add('flex');
+}
+
+function closeLightbox() {
+const lightbox = document.getElementById('lightbox');
+lightbox.classList.add('hidden');
+lightbox.classList.remove('flex');
+}
+
+// 계좌번호 복사 함수
+function copyAccount(accountNum) {
+if (navigator.clipboard && navigator.clipboard.writeText) {
+navigator.clipboard.writeText(accountNum).then(() => {
+showToast("계좌번호가 복사되었습니다.");
+}).catch(() => {
+fallbackCopy(accountNum);
+});
+} else {
+fallbackCopy(accountNum);
+}
+}
+
+function fallbackCopy(text) {
+const textarea = document.createElement("textarea");
+textarea.value = text;
+textarea.style.position = "fixed";
+document.body.appendChild(textarea);
+textarea.focus();
+textarea.select();
+try {
+document.execCommand('copy');
+showToast("계좌번호가 복사되었습니다.");
+} catch (err) {
+showToast("복사에 실패했습니다.");
+}
+document.body.removeChild(textarea);
+}
+
+function showToast(message) {
+const toast = document.getElementById('toast');
+toast.innerText = message;
+toast.style.opacity = '1';
+setTimeout(() => {
+toast.style.opacity = '0';
+}, 2000);
+}
+
+// 공유 모달 제어
+function openShareModal() {
+document.getElementById('shareModal').classList.remove('hidden');
+document.getElementById('shareModal').classList.add('flex');
+}
+
+function closeShareModal() {
+document.getElementById('shareModal').classList.add('hidden');
+document.getElementById('shareModal').classList.remove('flex');
+}
+
+function shareKakao() {
+if (navigator.share) {
+navigator.share({
+title: '김호준 ❤️ 이미소 결혼식에 초대합니다',
+text: '2026년 11월 14일 낮 12시 30분, 더 화이트베일 7층 다이아몬드홀',
+url: window.location.href,
+}).catch(() => {});
+} else {
+showToast("브라우저가 공유 기능을 지원하지 않습니다. 링크 복사를 이용해 주세요.");
+}
+closeShareModal();
+}
+
+function shareSMS() {
+const text = "[모바일 청첩장] 김호준 ❤️ 이미소 결혼식에 초대합니다.\n일시: 2026.11.14 (토) 낮 12:30\n장소: 더 화이트베일 7층\n링크: " + window.location.href;
+window.location.href = "sms:?body=" + encodeURIComponent(text);
+closeShareModal();
+}
+
+function copyLink() {
+copyAccount(window.location.href);
+showToast("청첩장 링크가 복사되었습니다.");
+closeShareModal();
+}
+
+// 웨딩 영상 썸네일 클릭 시 인라인 iframe 교체 재생
+function playInlineWeddingVideo() {
+const container = document.getElementById('weddingVideoContainer');
+if (!container) return;
+container.innerHTML = <iframe class="w-full h-full" src="https://www.youtube.com/embed/nW-NmR8JBTY?autoplay=1&playsinline=1&rel=0" title="웨딩 영상" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen&gt;&lt;/iframe>;
+}
+
+// 유튜브 IFrame Player API 연동 (첨부된 영상 ID: QbNubGnIY1E)
+let ytPlayer = null;
+let isBgmPlaying = false;
+let isPlayerReady = false;
+let weddingVideoPlayer = null;
+let isVideoMuted = true;
+
+// 유튜브 API 스크립트 동적 로드
+const tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+const firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+function onYouTubeIframeAPIReady() {
+// 배경음악 플레이어
+ytPlayer = new YT.Player('youtube-bgm-player', {
+height: '1',
+width: '1',
+videoId: 'QbNubGnIY1E',
+playerVars: {
+'autoplay': 0,
+'controls': 0,
+'loop': 1,
+'playlist': 'QbNubGnIY1E', // 반복 재생을 위해 playlist에 동일 ID 지정
+'playsinline': 1
+},
+events: {
+'onReady': () => {
+isPlayerReady = true;
+ytPlayer.setVolume(70); // 적절한 기본 볼륨 설정
+},
+'onStateChange': (event) => {
+if (event.data === YT.PlayerState.PLAYING) {
+updateBgmUI(true);
+} else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
+updateBgmUI(false);
+}
+}
+}
+});
+
+// 웨딩 영상 플레이어 제어 연동
+weddingVideoPlayer = new YT.Player('weddingVideoIframe', {
+events: {
+'onReady': (event) => {
+event.target.mute();
+event.target.playVideo();
+}
+}
+});
+}
+
+// 웨딩 영상 소리 켜기/끄기 토글
+function toggleVideoSound() {
+const icon = document.getElementById('videoSoundIcon');
+const text = document.getElementById('videoSoundText');
+
+if (weddingVideoPlayer && typeof weddingVideoPlayer.unMute === 'function') {
+if (isVideoMuted) {
+weddingVideoPlayer.unMute();
+weddingVideoPlayer.setVolume(80);
+isVideoMuted = false;
+icon.className = "fa-solid fa-volume-high text-brand-accent animate-pulse";
+text.innerText = "소리 끄기";
+// 배경음악이 재생 중이라면 겹치지 않게 일시정지
+if (isBgmPlaying && ytPlayer) {
+ytPlayer.pauseVideo();
+}
+} else {
+weddingVideoPlayer.mute();
+isVideoMuted = true;
+icon.className = "fa-solid fa-volume-xmark text-brand-accent";
+text.innerText = "소리 켜기";
+}
+} else {
+// API 준비 전 클릭 시 iframe src에서 mute=0으로 변경하여 재생
+const iframe = document.getElementById('weddingVideoIframe');
+if (isVideoMuted) {
+iframe.src = "https://www.youtube.com/embed/nW-NmR8JBTY?autoplay=1&mute=0&loop=1&playlist=nW-NmR8JBTY&playsinline=1&rel=0&enablejsapi=1";
+isVideoMuted = false;
+icon.className = "fa-solid fa-volume-high text-brand-accent animate-pulse";
+text.innerText = "소리 끄기";
+} else {
+iframe.src = "https://www.youtube.com/embed/nW-NmR8JBTY?autoplay=1&mute=1&loop=1&playlist=nW-NmR8JBTY&playsinline=1&rel=0&enablejsapi=1";
+isVideoMuted = true;
+icon.className = "fa-solid fa-volume-xmark text-brand-accent";
+text.innerText = "소리 켜기";
+}
+}
+}
+
+function toggleBGM() {
+if (!isPlayerReady || !ytPlayer) {
+showToast("배경음악을 준비 중입니다. 잠시 후 다시 눌러주세요.");
+return;
+}
+
+if (!isBgmPlaying) {
+ytPlayer.playVideo();
+showToast("첨부하신 웨딩 배경음악이 재생됩니다.");
+} else {
+ytPlayer.pauseVideo();
+showToast("배경음악이 일시정지되었습니다.");
+}
+}
+</script>
+</body>
+</html>
